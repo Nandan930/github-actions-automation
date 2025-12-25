@@ -1,16 +1,37 @@
-name: Free Automation Test
+name: Auto Video Generator
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"   # har 5 minute me run
   workflow_dispatch:
 
 jobs:
-  test-job:
+  build-video:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Say Hello
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install system packages
         run: |
-          echo "🚀 GitHub Actions is working!"
-          date
+          sudo apt update
+          sudo apt install -y ffmpeg
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Python libraries
+        run: |
+          pip install moviepy pillow imageio imageio-ffmpeg
+
+      - name: Generate video
+        run: |
+          python make_video.py
+
+      - name: Upload video
+        uses: actions/upload-artifact@v4
+        with:
+          name: exam-comedy-video
+          path: output.mp4
           
